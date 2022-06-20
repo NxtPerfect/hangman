@@ -2,6 +2,10 @@
 // use text_io::read;
 use std::io;
 
+// ! Problems: doesn't let me write the option before saying it was wrong
+// ! the word has end line before the end of quotes
+// ! the word to guess isn't underscored for all the letters in it, instead it shows one letter that isn't in the guessed word
+
 pub fn guessing(hidden_word: &str, guess: char, tries: usize) -> bool {
     // we need to check which char was guessed and then reveal it
     let mut is_correct = false;
@@ -39,9 +43,8 @@ fn main() {
     }
     let mut input = String::new();
 
-    let mut i = 0;
-    while hidden_word.eq(&original_word.to_lowercase()) || i < 5 {
-        let tries = hidden_word.chars().count();
+    let mut tries = hidden_word.chars().count();
+    while hidden_word.eq(&original_word.to_lowercase()) || tries > 0 {
         loop {
             match io::stdin().read_line(&mut input) {
                 Ok(_) => break,
@@ -52,7 +55,7 @@ fn main() {
             }
         }
 
-        if input.eq(&original_word) {
+        if input.to_lowercase().eq(&original_word.to_lowercase()) {
             println!("You guessed the word, good job!");
             break;
         }
@@ -60,10 +63,11 @@ fn main() {
         let guess = input.chars().nth(0).unwrap();
         if guessing(&hidden_word, guess, tries) {
             println!("That is correct!");
+            // reveal that letter in hidden_word
             continue;
         }
 
-        i += 1;
-        println!("Sadly this letter isn't in the word");
+        tries -= 1;
+        println!("Sadly that's a bad guess isn't in the word");
     }
 }
