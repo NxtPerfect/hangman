@@ -3,6 +3,7 @@
 use std::io;
 
 pub fn guessing(hidden_word: &str, guess: char, tries: usize) -> bool {
+    // we need to check which char was guessed and then reveal it
     let mut is_correct = false;
     println!(
         "Your word to guess is \"{}\", with {} tries left",
@@ -50,11 +51,18 @@ fn main() {
                 ),
             }
         }
+
+        if input.eq(&original_word) {
+            println!("You guessed the word, good job!");
+            break;
+        }
+
         let guess = input.chars().nth(0).unwrap();
         if guessing(&hidden_word, guess, tries) {
             println!("That is correct!");
             continue;
         }
+
         i += 1;
         println!("Sadly this letter isn't in the word");
     }
