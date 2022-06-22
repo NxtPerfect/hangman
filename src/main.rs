@@ -6,7 +6,7 @@ use std::io;
 // ! the word has end line before the end of quotes
 // ! the word to guess isn't underscored for all the letters in it, instead it shows one letter that isn't in the guessed word
 
-pub fn guessing(hidden_word: &str, guess: char, tries: usize) -> bool {
+pub fn guessing(hidden_word: &str, guess: char, original_word: &str, tries: usize) -> bool {
     // we need to check which char was guessed and then reveal it
     let mut is_correct = false;
     println!(
@@ -14,8 +14,7 @@ pub fn guessing(hidden_word: &str, guess: char, tries: usize) -> bool {
         guess, tries
     );
     for n in 1..hidden_word.len() {
-        if hidden_word.chars().nth(n).unwrap().eq(&guess) {
-            // char from &str
+        if original_word.chars().nth(n).unwrap().eq(&guess) {
             is_correct = true;
         }
     }
@@ -37,13 +36,17 @@ fn main() {
             Err(e) => println!("Opps! something went wrong: {}", e),
         }
     }
-    let mut hidden_word = String::from(&original_word);
-    for i in 1..hidden_word.len() {
-        hidden_word.replace_range(i - 1..i, "_");
-    }
-    let mut input = String::new();
 
+    let mut hidden_word = String::new();
+
+    for i in 1..original_word.len() {
+        hidden_word += "_";
+        // this needs to replace each char
+    }
+
+    let mut input = String::new();
     let mut tries = hidden_word.chars().count();
+
     while hidden_word.eq(&original_word.to_lowercase()) || tries > 0 {
         loop {
             match io::stdin().read_line(&mut input) {
@@ -61,9 +64,21 @@ fn main() {
         }
 
         let guess = input.chars().nth(0).unwrap();
-        if guessing(&hidden_word, guess, tries) {
+        if guessing(&hidden_word, guess, &original_word, tries) {
             println!("That is correct!");
-            // reveal that letter in hidden_word
+            for i in 1..original_word.len() {
+                if original_word.chars().nth(i) == input.chars().nth(0) {
+                    hidden_word
+                        .chars()
+                        .nth(i)
+                        .clone_from(&original_word.chars().nth(i));
+                    break;
+                };
+            }
+            // ! reveal that letter in hidden_word
+            // ! search through guess for the letter we guessed
+            // ! if it's there then put that letter in hidden_word
+
             continue;
         }
 
